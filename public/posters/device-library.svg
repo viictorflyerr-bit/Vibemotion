@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 680" role="img" aria-label="Celular com biblioteca VIBE MOTION">
+  <defs>
+    <linearGradient id="p" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#101827"/><stop offset="1" stop-color="#05070A"/></linearGradient>
+    <linearGradient id="s" x1="0" x2="1"><stop offset="0" stop-color="#087EFF"/><stop offset="1" stop-color="#35C8FF"/></linearGradient>
+  </defs>
+  <rect x="120" y="18" width="280" height="610" rx="42" fill="#02040A" stroke="#35C8FF" stroke-width="3"/>
+  <rect x="144" y="56" width="232" height="532" rx="26" fill="url(#p)"/>
+  <rect x="202" y="37" width="116" height="10" rx="5" fill="#1D2A3D"/>
+  <text x="260" y="110" fill="#35C8FF" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="900" text-anchor="middle" letter-spacing="4">VIBE MOTION</text>
+  <rect x="166" y="136" width="188" height="112" rx="12" fill="url(#s)"/>
+  <text x="260" y="191" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="900" text-anchor="middle">PACKS LED</text>
+  <text x="260" y="221" fill="#D9F7FF" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="3">PRONTOS PARA USAR</text>
+  <g fill="#0B1424" stroke="#24496D">
+    <rect x="166" y="272" width="84" height="72" rx="8"/><rect x="270" y="272" width="84" height="72" rx="8"/>
+    <rect x="166" y="364" width="84" height="72" rx="8"/><rect x="270" y="364" width="84" height="72" rx="8"/>
+    <rect x="166" y="456" width="84" height="72" rx="8"/><rect x="270" y="456" width="84" height="72" rx="8"/>
+  </g>
+  <g fill="#35C8FF" opacity=".7">
+    <circle cx="208" cy="308" r="16"/><circle cx="312" cy="308" r="16"/>
+    <circle cx="208" cy="400" r="16"/><circle cx="312" cy="400" r="16"/>
+    <circle cx="208" cy="492" r="16"/><circle cx="312" cy="492" r="16"/>
+  </g>
+  <rect x="190" y="552" width="140" height="14" rx="7" fill="#087EFF"/>
+</svg>
