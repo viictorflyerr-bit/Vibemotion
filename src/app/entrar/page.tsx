@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye } from "lucide-react";
+import { Eye, X } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
 import { RecaptchaV2 } from "@/components/recaptcha-v2";
 import { verifyRecaptchaToken } from "@/lib/recaptcha";
@@ -72,8 +72,15 @@ export default function EntrarPage() {
     <main className="grid min-h-screen place-items-center bg-[#05070A] px-4 py-8 text-white">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-[10px] border border-cyan-100/12 bg-[#1B1D20] p-8"
+        className="relative w-full max-w-md rounded-[10px] border border-cyan-100/12 bg-[#1B1D20] p-8"
       >
+        <Link
+          href={returnTo}
+          aria-label="Fechar e voltar"
+          className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full text-cyan-50/55 transition hover:bg-white/[0.06] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#35C8FF]"
+        >
+          <X aria-hidden="true" className="h-5 w-5" />
+        </Link>
         <h1 className="text-center text-3xl font-black">Entrar</h1>
         <label className="mt-8 block">
           <span className="text-sm font-bold text-cyan-50/70">E-mail</span>
