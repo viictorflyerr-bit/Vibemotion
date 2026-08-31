@@ -15,7 +15,7 @@ const nav = [
   ["Início", "/"],
   ["Suporte", "/suporte"],
   ["Tutoriais", "/#tutoriais"],
-  ["Catálogo", "/#animacoes-diferentes"],
+  ["Pedidos", "/pedidos"],
 ];
 
 const faqItems = [

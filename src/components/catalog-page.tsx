@@ -16,7 +16,7 @@ import { categories, formatPrice, products, type Product } from "@/lib/catalog-d
 import { useAuth } from "@/components/auth-provider";
 import { useCart } from "@/components/cart-provider";
 
-const nav = [["Início", "/"], ["Suporte", "/suporte"], ["Tutoriais", "/#tutoriais"], ["Catálogo", "/#animacoes-diferentes"]];
+const nav = [["Início", "/"], ["Suporte", "/suporte"], ["Tutoriais", "/#tutoriais"], ["Pedidos", "/pedidos"]];
 const filterItems = [
   { id: "recent", name: "Adicionados recentemente" },
   { id: "variados", name: "Variados" },
@@ -66,18 +66,16 @@ const recentProducts = products.slice(0, recentCardNames.length).map((product, i
 function Brand() {
   return <Link href="/" className="block" aria-label="Vibe Motion"><Image src="/header-logo.png" alt="Vibe Motion" width={220} height={70} className="h-16 w-auto object-contain" priority /></Link>;
 }
-type ActiveNav = "home" | "tutorials" | "animations";
+type ActiveNav = "home" | "tutorials";
 
 function Header({
   activeNav,
   showAll,
   showTutorials,
-  showAnimations,
 }: {
   activeNav: ActiveNav;
   showAll: () => void;
   showTutorials: () => void;
-  showAnimations: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const { count } = useCart();
@@ -93,21 +91,16 @@ function Header({
     setOpen(false);
     showTutorials();
   }
-  function openAnimations(event: ReactMouseEvent<HTMLAnchorElement>) {
-    event.preventDefault();
-    setOpen(false);
-    showAnimations();
-  }
   return <header className="sticky top-0 z-50 border-b border-white/[.07] bg-[#07090C]/95 backdrop-blur-xl">
     <div className="mx-auto flex h-[72px] max-w-[1220px] items-center gap-7 px-4 sm:px-6">
       <button onClick={() => setOpen(!open)} className="grid h-10 w-10 place-items-center text-[#35C8FF] lg:hidden" aria-label="Abrir menu">{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
       <div className="hidden lg:block"><Brand /></div>
-      <nav className="hidden h-full lg:flex">{nav.map(([label, href], index) => <Link key={href} href={href} onClick={index === 0 ? openHome : index === 2 ? openTutorials : index === 3 ? openAnimations : undefined} className={`font-tektur flex h-full items-center border-b-2 px-4 text-[.68rem] font-black uppercase tracking-[.1em] transition ${activeNav === ["home", "support", "tutorials", "animations"][index] ? "border-[#35C8FF] text-[#35C8FF]" : "border-transparent text-white/55 hover:text-white"}`}>{label}</Link>)}</nav>
+      <nav className="hidden h-full lg:flex">{nav.map(([label, href], index) => <Link key={href} href={href} onClick={index === 0 ? openHome : index === 2 ? openTutorials : undefined} className={`font-tektur flex h-full items-center border-b-2 px-4 text-[.68rem] font-black uppercase tracking-[.1em] transition ${activeNav === ["home", "support", "tutorials", "orders"][index] ? "border-[#35C8FF] text-[#35C8FF]" : "border-transparent text-white/55 hover:text-white"}`}>{label}</Link>)}</nav>
       <div className="mx-auto lg:hidden"><Brand /></div>
       <div className="ml-auto hidden items-center gap-3 lg:flex">{user ? <><Link href="/perfil" className="font-tektur inline-flex h-10 max-w-52 items-center gap-2 rounded-full border border-white/14 px-4 text-[.65rem] font-black uppercase text-white transition hover:border-[#35C8FF]/50 hover:text-[#35C8FF]"><CircleUserRound className="h-4 w-4"/><span className="truncate">{displayName}</span></Link><button onClick={exit} className="grid h-10 w-10 place-items-center rounded-full text-white/40 transition hover:bg-[#35C8FF]/10 hover:text-white" aria-label="Sair"><LogOut className="h-4 w-4"/></button></> : <Link href="/entrar" className="font-tektur inline-flex h-10 items-center gap-2 rounded-full border border-white/14 px-4 text-[.65rem] font-black uppercase tracking-[.12em] text-white transition hover:border-[#35C8FF]/50 hover:text-[#35C8FF]"><CircleUserRound className="h-4 w-4"/>Entrar</Link>}<Link href="/pedido" className="shine-button font-tektur relative h-10 gap-2 px-4 text-[.65rem] font-black uppercase tracking-[.12em]" aria-label={`Carrinho com ${count} itens`}><ShoppingBag className="h-4 w-4"/>Carrinho{count ? <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[.58rem] font-black text-[#05070A]">{count}</span> : null}</Link></div>
       <Link href="/pedido" className="relative grid h-10 w-10 place-items-center lg:hidden" aria-label="Carrinho"><ShoppingBag className="h-5 w-5"/>{count ? <span className="absolute right-0 top-0 grid h-4 min-w-4 place-items-center rounded-full bg-[#35C8FF] px-1 text-[.5rem] font-black text-[#05070A]">{count}</span> : null}</Link>
     </div>
-    {open ? <nav className="absolute inset-x-0 top-[72px] min-h-[calc(100vh-72px)] bg-[#07090C] p-5 lg:hidden"><div className="grid gap-1">{nav.map(([label, href], index) => <Link key={href} href={href} onClick={index === 0 ? openHome : index === 2 ? openTutorials : index === 3 ? openAnimations : () => setOpen(false)} className={"font-tektur flex h-14 items-center border-b border-l-2 border-white/[.08] pl-4 text-sm font-black uppercase tracking-[.1em] transition " + (activeNav === ["home", "support", "tutorials", "animations"][index] ? "border-l-[#35C8FF] bg-[#35C8FF]/8 text-[#35C8FF]" : "border-l-transparent text-white")}>{label}</Link>)}</div><div className="mt-8 grid gap-3">{user ? <><Link href="/perfil" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center gap-2 rounded-full border border-white/14 text-xs font-black uppercase text-white"><CircleUserRound className="h-4 w-4"/>{displayName}</Link><button onClick={exit} className="font-tektur flex h-12 items-center justify-center gap-2 text-xs font-black uppercase text-white/55"><LogOut className="h-4 w-4"/>Sair</button></> : <><Link href="/entrar" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center gap-2 rounded-full border border-white/14 text-xs font-black uppercase text-white"><CircleUserRound className="h-4 w-4"/>Entrar</Link><Link href="/cadastro" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center text-xs font-black uppercase text-[#35C8FF]">Criar conta</Link></>}<Link href="/pedido" onClick={() => setOpen(false)} className="shine-button font-tektur h-12 gap-2 text-xs font-black uppercase"><ShoppingBag className="h-4 w-4"/>Carrinho{count ? <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[.58rem] text-[#05070A]">{count}</span> : null}</Link></div></nav> : null}
+    {open ? <nav className="absolute inset-x-0 top-[72px] min-h-[calc(100vh-72px)] bg-[#07090C] p-5 lg:hidden"><div className="grid gap-1">{nav.map(([label, href], index) => <Link key={href} href={href} onClick={index === 0 ? openHome : index === 2 ? openTutorials : () => setOpen(false)} className={"font-tektur flex h-14 items-center border-b border-l-2 border-white/[.08] pl-4 text-sm font-black uppercase tracking-[.1em] transition " + (activeNav === ["home", "support", "tutorials", "orders"][index] ? "border-l-[#35C8FF] bg-[#35C8FF]/8 text-[#35C8FF]" : "border-l-transparent text-white")}>{label}</Link>)}</div><div className="mt-8 grid gap-3">{user ? <><Link href="/perfil" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center gap-2 rounded-full border border-white/14 text-xs font-black uppercase text-white"><CircleUserRound className="h-4 w-4"/>{displayName}</Link><button onClick={exit} className="font-tektur flex h-12 items-center justify-center gap-2 text-xs font-black uppercase text-white/55"><LogOut className="h-4 w-4"/>Sair</button></> : <><Link href="/entrar" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center gap-2 rounded-full border border-white/14 text-xs font-black uppercase text-white"><CircleUserRound className="h-4 w-4"/>Entrar</Link><Link href="/cadastro" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center text-xs font-black uppercase text-[#35C8FF]">Criar conta</Link></>}<Link href="/pedido" onClick={() => setOpen(false)} className="shine-button font-tektur h-12 gap-2 text-xs font-black uppercase"><ShoppingBag className="h-4 w-4"/>Carrinho{count ? <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[.58rem] text-[#05070A]">{count}</span> : null}</Link></div></nav> : null}
   </header>;
 }
 
@@ -336,7 +329,7 @@ export function CatalogPage() {
 
       setTutorialsOpen(false);
       if (hash === "#animacoes-diferentes") {
-        setActiveNav("animations");
+        setActiveNav("home");
         window.requestAnimationFrame(() => document.getElementById("animacoes-diferentes")?.scrollIntoView({ behavior: "smooth", block: "start" }));
         return;
       }
@@ -383,7 +376,7 @@ export function CatalogPage() {
   }
   function chooseCategory(value: string) {
     setTutorialsOpen(false);
-    setActiveNav("animations");
+    setActiveNav("home");
     setQuery("");
     setActive(value);
     window.history.replaceState(null, "", "#animacoes-diferentes");
@@ -395,15 +388,7 @@ export function CatalogPage() {
     window.history.replaceState(null, "", "#tutoriais");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
-  function showAnimations() {
-    setTutorialsOpen(false);
-    setActiveNav("animations");
-    setQuery("");
-    setActive("all");
-    window.history.replaceState(null, "", "#animacoes-diferentes");
-    window.requestAnimationFrame(() => document.getElementById("animacoes-diferentes")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-  }
-  return <div className="min-h-screen overflow-x-hidden bg-[#07090C] text-white"><Header activeNav={activeNav} showAll={showAll} showTutorials={showTutorials} showAnimations={showAnimations}/><main>{tutorialsOpen ? <TutorialsView/> : <>{focusedCategory ? <CategoryFocus category={focusedCategory} count={filtered.length} showAll={showAll}/> : <Hero query={query} change={setQuery}/>}<div id="animacoes-diferentes"><Filters active={active} choose={chooseCategory}/></div><div id="catalogo">{filtered.length ? shownCategories.map((category) => <Category key={category.id} category={category} items={filtered.filter((item) => item.categoryId === category.id)} showHeading={active === "all"}/>) : <div className="grid min-h-72 place-items-center border-b border-white/[.06] text-center"><div><Search className="mx-auto h-7 w-7 text-[#35C8FF]"/><p className="font-tektur mt-4 text-sm font-black uppercase">Nenhum visual encontrado</p><button onClick={showAll} className="font-tektur mt-4 text-[.6rem] font-black uppercase text-[#35C8FF]">Limpar filtros</button></div></div>}</div><Steps/></>}</main><Footer/><CartNotice/></div>;
+  return <div className="min-h-screen overflow-x-hidden bg-[#07090C] text-white"><Header activeNav={activeNav} showAll={showAll} showTutorials={showTutorials}/><main>{tutorialsOpen ? <TutorialsView/> : <>{focusedCategory ? <CategoryFocus category={focusedCategory} count={filtered.length} showAll={showAll}/> : <Hero query={query} change={setQuery}/>}<div id="animacoes-diferentes"><Filters active={active} choose={chooseCategory}/></div><div id="catalogo">{filtered.length ? shownCategories.map((category) => <Category key={category.id} category={category} items={filtered.filter((item) => item.categoryId === category.id)} showHeading={active === "all"}/>) : <div className="grid min-h-72 place-items-center border-b border-white/[.06] text-center"><div><Search className="mx-auto h-7 w-7 text-[#35C8FF]"/><p className="font-tektur mt-4 text-sm font-black uppercase">Nenhum visual encontrado</p><button onClick={showAll} className="font-tektur mt-4 text-[.6rem] font-black uppercase text-[#35C8FF]">Limpar filtros</button></div></div>}</div><Steps/></>}</main><Footer/><CartNotice/></div>;
 }
 
 
