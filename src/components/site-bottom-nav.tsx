@@ -1,11 +1,11 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import {CircleHelp,CircleUserRound,Grid2X2,Home,MessageCircle} from "lucide-react";
 
 const items=[
  {label:"Catálogo",href:"/",icon:Home},
- {label:"Comunidade",href:"/comunidade",icon:Grid2X2},
+ {label:"Suporte",href:"/suporte",icon:Grid2X2},
  {label:"Tutoriais",href:"/#tutoriais",icon:MessageCircle},
- {label:"Suporte",href:"mailto:suporte.vibemotion@gmail.com",icon:CircleHelp},
+ {label:"Contato",href:"mailto:suporte.vibemotion@gmail.com",icon:CircleHelp},
  {label:"Perfil",href:"/perfil",icon:CircleUserRound},
 ];
 

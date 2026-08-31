@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -10,12 +11,12 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Check, CircleUserRound, ListChecks, LogOut, Menu, Play, Search, ShoppingBag, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, CircleUserRound, ListChecks, LogOut, Menu, Play, Search, ShoppingBag, X } from "lucide-react";
 import { categories, formatPrice, products, type Product } from "@/lib/catalog-data";
 import { useAuth } from "@/components/auth-provider";
 import { useCart } from "@/components/cart-provider";
 
-const nav = [["Início", "/"], ["Comunidade", "/comunidade"], ["Tutoriais", "/#tutoriais"], ["Animações diferentes", "/#animacoes-diferentes"]];
+const nav = [["Início", "/"], ["Suporte", "/suporte"], ["Tutoriais", "/#tutoriais"], ["Catálogo", "/#animacoes-diferentes"]];
 const filterItems = [
   { id: "recent", name: "Adicionados recentemente" },
   { id: "variados", name: "Variados" },
@@ -30,8 +31,6 @@ const filterItems = [
   { id: "e-os-guri-rs", name: "É os Guri - Rio Grande do Sul" },
   { id: "pagode", name: "Pagode - Samba" },
   { id: "retro-baile", name: "Retrô/Baile" },
-  { id: "sao-joao", name: "São João" },
-  { id: "copa-do-mundo", name: "Copa do Mundo" },
 ];
 const orderedCategories = filterItems
   .filter((item) => item.id !== "recent")
@@ -44,14 +43,18 @@ const recentCategory = {
 };
 
 const recentCardNames = [
-  "Amor Iluminado",
-  "Carro do Patrão",
-  "Paredão de Som",
-  "Show Noturno",
-  "Neon Cyberpunk",
-  "Paredão de Som",
-  "Sala do Vaqueiro",
-  "Na Mesa do DJ",
+  "AMOR ILUMINADO",
+  "CARRO DO PATRÃO",
+  "PAREDÃO DE SOM",
+  "SHOW NOTURNO",
+  "FUNDO DA GROTA",
+  "CORREDOR NEON",
+  "NEON CYBERPUNK",
+  "PAREDÃO DE SOM",
+  "SALA DO VAQUEIRO",
+  "NA MESA DO DJ",
+  "FORRÓ DE INTERIOR",
+  "MÚSICA E PAREDÃO",
 ];
 
 const recentProducts = products.slice(0, recentCardNames.length).map((product, index) => ({
@@ -63,7 +66,19 @@ const recentProducts = products.slice(0, recentCardNames.length).map((product, i
 function Brand() {
   return <Link href="/" className="block" aria-label="Vibe Motion"><Image src="/header-logo.png" alt="Vibe Motion" width={220} height={70} className="h-16 w-auto object-contain" priority /></Link>;
 }
-function Header({ showAll, showTutorials }: { showAll: () => void; showTutorials: () => void }) {
+type ActiveNav = "home" | "tutorials" | "animations";
+
+function Header({
+  activeNav,
+  showAll,
+  showTutorials,
+  showAnimations,
+}: {
+  activeNav: ActiveNav;
+  showAll: () => void;
+  showTutorials: () => void;
+  showAnimations: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const { count } = useCart();
   const { user, displayName, logout } = useAuth();
@@ -78,16 +93,21 @@ function Header({ showAll, showTutorials }: { showAll: () => void; showTutorials
     setOpen(false);
     showTutorials();
   }
+  function openAnimations(event: ReactMouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    setOpen(false);
+    showAnimations();
+  }
   return <header className="sticky top-0 z-50 border-b border-white/[.07] bg-[#07090C]/95 backdrop-blur-xl">
     <div className="mx-auto flex h-[72px] max-w-[1220px] items-center gap-7 px-4 sm:px-6">
       <button onClick={() => setOpen(!open)} className="grid h-10 w-10 place-items-center text-[#35C8FF] lg:hidden" aria-label="Abrir menu">{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
       <div className="hidden lg:block"><Brand /></div>
-      <nav className="hidden h-full lg:flex">{nav.map(([label, href], index) => <Link key={href} href={href} onClick={index === 0 ? openHome : index === 2 ? openTutorials : undefined} className={`font-tektur flex h-full items-center border-b-2 px-4 text-[.68rem] font-black uppercase tracking-[.1em] transition ${index === 0 ? "border-[#35C8FF] text-[#35C8FF]" : "border-transparent text-white/55 hover:text-white"}`}>{label}</Link>)}</nav>
+      <nav className="hidden h-full lg:flex">{nav.map(([label, href], index) => <Link key={href} href={href} onClick={index === 0 ? openHome : index === 2 ? openTutorials : index === 3 ? openAnimations : undefined} className={`font-tektur flex h-full items-center border-b-2 px-4 text-[.68rem] font-black uppercase tracking-[.1em] transition ${activeNav === ["home", "support", "tutorials", "animations"][index] ? "border-[#35C8FF] text-[#35C8FF]" : "border-transparent text-white/55 hover:text-white"}`}>{label}</Link>)}</nav>
       <div className="mx-auto lg:hidden"><Brand /></div>
       <div className="ml-auto hidden items-center gap-3 lg:flex">{user ? <><Link href="/perfil" className="font-tektur inline-flex h-10 max-w-52 items-center gap-2 rounded-full border border-white/14 px-4 text-[.65rem] font-black uppercase text-white transition hover:border-[#35C8FF]/50 hover:text-[#35C8FF]"><CircleUserRound className="h-4 w-4"/><span className="truncate">{displayName}</span></Link><button onClick={exit} className="grid h-10 w-10 place-items-center rounded-full text-white/40 transition hover:bg-[#35C8FF]/10 hover:text-white" aria-label="Sair"><LogOut className="h-4 w-4"/></button></> : <Link href="/entrar" className="font-tektur inline-flex h-10 items-center gap-2 rounded-full border border-white/14 px-4 text-[.65rem] font-black uppercase tracking-[.12em] text-white transition hover:border-[#35C8FF]/50 hover:text-[#35C8FF]"><CircleUserRound className="h-4 w-4"/>Entrar</Link>}<Link href="/pedido" className="shine-button font-tektur relative h-10 gap-2 px-4 text-[.65rem] font-black uppercase tracking-[.12em]" aria-label={`Carrinho com ${count} itens`}><ShoppingBag className="h-4 w-4"/>Carrinho{count ? <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[.58rem] font-black text-[#05070A]">{count}</span> : null}</Link></div>
       <Link href="/pedido" className="relative grid h-10 w-10 place-items-center lg:hidden" aria-label="Carrinho"><ShoppingBag className="h-5 w-5"/>{count ? <span className="absolute right-0 top-0 grid h-4 min-w-4 place-items-center rounded-full bg-[#35C8FF] px-1 text-[.5rem] font-black text-[#05070A]">{count}</span> : null}</Link>
     </div>
-    {open ? <nav className="absolute inset-x-0 top-[72px] min-h-[calc(100vh-72px)] bg-[#07090C] p-5 lg:hidden"><div className="grid gap-1">{nav.map(([label, href], index) => <Link key={href} href={href} onClick={index === 0 ? openHome : index === 2 ? openTutorials : () => setOpen(false)} className="font-tektur flex h-14 items-center border-b border-white/[.08] text-sm font-black uppercase tracking-[.1em] text-white">{label}</Link>)}</div><div className="mt-8 grid gap-3">{user ? <><Link href="/perfil" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center gap-2 rounded-full border border-white/14 text-xs font-black uppercase text-white"><CircleUserRound className="h-4 w-4"/>{displayName}</Link><button onClick={exit} className="font-tektur flex h-12 items-center justify-center gap-2 text-xs font-black uppercase text-white/55"><LogOut className="h-4 w-4"/>Sair</button></> : <><Link href="/entrar" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center gap-2 rounded-full border border-white/14 text-xs font-black uppercase text-white"><CircleUserRound className="h-4 w-4"/>Entrar</Link><Link href="/cadastro" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center text-xs font-black uppercase text-[#35C8FF]">Criar conta</Link></>}<Link href="/pedido" onClick={() => setOpen(false)} className="shine-button font-tektur h-12 gap-2 text-xs font-black uppercase"><ShoppingBag className="h-4 w-4"/>Carrinho{count ? <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[.58rem] text-[#05070A]">{count}</span> : null}</Link></div></nav> : null}
+    {open ? <nav className="absolute inset-x-0 top-[72px] min-h-[calc(100vh-72px)] bg-[#07090C] p-5 lg:hidden"><div className="grid gap-1">{nav.map(([label, href], index) => <Link key={href} href={href} onClick={index === 0 ? openHome : index === 2 ? openTutorials : index === 3 ? openAnimations : () => setOpen(false)} className={"font-tektur flex h-14 items-center border-b border-l-2 border-white/[.08] pl-4 text-sm font-black uppercase tracking-[.1em] transition " + (activeNav === ["home", "support", "tutorials", "animations"][index] ? "border-l-[#35C8FF] bg-[#35C8FF]/8 text-[#35C8FF]" : "border-l-transparent text-white")}>{label}</Link>)}</div><div className="mt-8 grid gap-3">{user ? <><Link href="/perfil" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center gap-2 rounded-full border border-white/14 text-xs font-black uppercase text-white"><CircleUserRound className="h-4 w-4"/>{displayName}</Link><button onClick={exit} className="font-tektur flex h-12 items-center justify-center gap-2 text-xs font-black uppercase text-white/55"><LogOut className="h-4 w-4"/>Sair</button></> : <><Link href="/entrar" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center gap-2 rounded-full border border-white/14 text-xs font-black uppercase text-white"><CircleUserRound className="h-4 w-4"/>Entrar</Link><Link href="/cadastro" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center text-xs font-black uppercase text-[#35C8FF]">Criar conta</Link></>}<Link href="/pedido" onClick={() => setOpen(false)} className="shine-button font-tektur h-12 gap-2 text-xs font-black uppercase"><ShoppingBag className="h-4 w-4"/>Carrinho{count ? <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[.58rem] text-[#05070A]">{count}</span> : null}</Link></div></nav> : null}
   </header>;
 }
 
@@ -201,16 +221,6 @@ function ProductCard({ product }: { product: Product }) {
           sizes="(max-width:560px) 50vw, (max-width:920px) 33vw, 25vw"
         />
         <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        <button
-          type="button"
-          className="absolute left-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-black/60 text-white transition group-hover:bg-[#35C8FF] group-hover:text-[#05070A]"
-          aria-label={`Assistir ${product.title}`}
-        >
-          <Play className="ml-0.5 h-3.5 w-3.5 fill-current" />
-        </button>
-        <span className="font-tektur absolute bottom-2 right-2 bg-black/70 px-2 py-1 text-[.5rem] font-bold uppercase tracking-[.12em] text-white/70">
-          Full HD
-        </span>
       </div>
       <div className="p-3">
         <p className="font-tektur text-[.5rem] font-bold uppercase tracking-[.17em] text-[#35C8FF]">
@@ -238,8 +248,60 @@ function ProductCard({ product }: { product: Product }) {
 }
 
 function Category({ category, items, showHeading = true }: { category: (typeof categories)[number]; items: Product[]; showHeading?: boolean }) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const hasCarousel = items.length > 8;
+
   if (!items.length) return null;
-  return <section id={category.id} className="scroll-mt-40 border-b border-white/[.045] px-4 py-8 sm:px-6 sm:py-10"><div className="mx-auto max-w-[1220px]">{showHeading ? <div className="mb-5"><h2 className="font-tektur text-lg font-black uppercase sm:text-xl">{category.name}</h2><p className="font-tektur mt-1 text-[.55rem] font-bold uppercase tracking-[.12em] text-[#35C8FF]">{items.length} modelos disponíveis</p></div> : null}<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">{items.map((item) => <ProductCard key={item.id} product={item}/>)}</div></div></section>;
+
+  function moveCards(direction: -1 | 1) {
+    const rail = railRef.current;
+    if (!rail) return;
+    rail.scrollBy({
+      left: direction * Math.max(rail.clientWidth * 0.85, 280),
+      behavior: "smooth",
+    });
+  }
+
+  return (
+    <section id={category.id} className="scroll-mt-40 border-b border-white/[.045] px-4 py-8 sm:px-6 sm:py-10">
+      <div className="mx-auto max-w-[1220px]">
+        {showHeading || hasCarousel ? (
+          <div className="mb-5 flex items-end justify-between gap-4">
+            {showHeading ? (
+              <div>
+                <h2 className="font-tektur text-lg font-black uppercase sm:text-xl">{category.name}</h2>
+                <p className="font-tektur mt-1 text-[.55rem] font-bold uppercase tracking-[.12em] text-[#35C8FF]">{items.length} modelos disponíveis</p>
+              </div>
+            ) : <span />}
+            {hasCarousel ? (
+              <div className="flex shrink-0 items-center gap-2" aria-label={"Navegação dos cards de " + category.name}>
+                <button type="button" onClick={() => moveCards(-1)} aria-label={"Voltar cards de " + category.name} className="grid h-10 w-10 place-items-center rounded-full border border-white/14 bg-white/[.025] text-white transition hover:border-[#35C8FF] hover:bg-[#35C8FF] hover:text-[#05070A]">
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button type="button" onClick={() => moveCards(1)} aria-label={"Avançar cards de " + category.name} className="grid h-10 w-10 place-items-center rounded-full border border-white/14 bg-white/[.025] text-white transition hover:border-[#35C8FF] hover:bg-[#35C8FF] hover:text-[#05070A]">
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {hasCarousel ? (
+          <div
+            ref={railRef}
+            className="grid grid-flow-col grid-rows-2 auto-cols-[calc((100%_-_0.75rem)/2)] gap-3 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory sm:auto-cols-[calc((100%_-_1.5rem)/3)] lg:auto-cols-[calc((100%_-_2.25rem)/4)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            aria-label={"Cards de " + category.name}
+          >
+            {items.map((item) => <div key={item.id} className="snap-start [&>article]:h-full"><ProductCard product={item} /></div>)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {items.map((item) => <ProductCard key={item.id} product={item} />)}
+          </div>
+        )}
+      </div>
+    </section>
+  );
 }
 function Steps() {
   const items = [["01", "Escolha um visual", "Navegue pelo catálogo e encontre o modelo que combina com seu show."], ["02", "Monte seu pedido", "Adicione os visuais. Sua seleção fica salva enquanto você navega."], ["03", "Finalize pelo WhatsApp", "Revise os itens, informe os dados e envie o pedido ao atendimento."]];
@@ -260,6 +322,36 @@ export function CatalogPage() {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState("all");
   const [tutorialsOpen, setTutorialsOpen] = useState(false);
+  const [activeNav, setActiveNav] = useState<ActiveNav>("home");
+
+  useEffect(() => {
+    function syncNavigation() {
+      const hash = window.location.hash;
+      if (hash === "#tutoriais") {
+        setTutorialsOpen(true);
+        setActiveNav("tutorials");
+        window.scrollTo({ top: 0 });
+        return;
+      }
+
+      setTutorialsOpen(false);
+      if (hash === "#animacoes-diferentes") {
+        setActiveNav("animations");
+        window.requestAnimationFrame(() => document.getElementById("animacoes-diferentes")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        return;
+      }
+
+      setActiveNav("home");
+    }
+
+    const frame = window.requestAnimationFrame(syncNavigation);
+    window.addEventListener("hashchange", syncNavigation);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("hashchange", syncNavigation);
+    };
+  }, []);
+
   const search = query.trim().toLocaleLowerCase("pt-BR");
   const filtered = useMemo(() => {
     const sourceProducts = active === "recent"
@@ -281,10 +373,37 @@ export function CatalogPage() {
       ? [recentCategory, ...orderedCategories]
       : categories.filter((item) => item.id === active);
   const focusedCategory = active === "recent" ? recentCategory : categories.find((item) => item.id === active);
-  function showAll() { setTutorialsOpen(false); setQuery(""); setActive("all"); window.scrollTo({ top: 0, behavior: "smooth" }); }
-  function chooseCategory(value: string) { setTutorialsOpen(false); setQuery(""); setActive(value); window.scrollTo({ top: 0, behavior: "smooth" }); }
-  function showTutorials() { setTutorialsOpen(true); window.scrollTo({ top: 0, behavior: "smooth" }); }
-  return <div className="min-h-screen overflow-x-hidden bg-[#07090C] text-white"><Header showAll={showAll} showTutorials={showTutorials}/><main>{tutorialsOpen ? <TutorialsView/> : <>{focusedCategory ? <CategoryFocus category={focusedCategory} count={filtered.length} showAll={showAll}/> : <Hero query={query} change={setQuery}/>}<Filters active={active} choose={chooseCategory}/><div id="catalogo">{filtered.length ? shownCategories.map((category) => <Category key={category.id} category={category} items={filtered.filter((item) => item.categoryId === category.id)} showHeading={active === "all"}/>) : <div className="grid min-h-72 place-items-center border-b border-white/[.06] text-center"><div><Search className="mx-auto h-7 w-7 text-[#35C8FF]"/><p className="font-tektur mt-4 text-sm font-black uppercase">Nenhum visual encontrado</p><button onClick={showAll} className="font-tektur mt-4 text-[.6rem] font-black uppercase text-[#35C8FF]">Limpar filtros</button></div></div>}</div><Steps/></>}</main><Footer/><CartNotice/></div>;
+  function showAll() {
+    setTutorialsOpen(false);
+    setActiveNav("home");
+    setQuery("");
+    setActive("all");
+    window.history.replaceState(null, "", window.location.pathname);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function chooseCategory(value: string) {
+    setTutorialsOpen(false);
+    setActiveNav("animations");
+    setQuery("");
+    setActive(value);
+    window.history.replaceState(null, "", "#animacoes-diferentes");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function showTutorials() {
+    setTutorialsOpen(true);
+    setActiveNav("tutorials");
+    window.history.replaceState(null, "", "#tutoriais");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function showAnimations() {
+    setTutorialsOpen(false);
+    setActiveNav("animations");
+    setQuery("");
+    setActive("all");
+    window.history.replaceState(null, "", "#animacoes-diferentes");
+    window.requestAnimationFrame(() => document.getElementById("animacoes-diferentes")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }
+  return <div className="min-h-screen overflow-x-hidden bg-[#07090C] text-white"><Header activeNav={activeNav} showAll={showAll} showTutorials={showTutorials} showAnimations={showAnimations}/><main>{tutorialsOpen ? <TutorialsView/> : <>{focusedCategory ? <CategoryFocus category={focusedCategory} count={filtered.length} showAll={showAll}/> : <Hero query={query} change={setQuery}/>}<div id="animacoes-diferentes"><Filters active={active} choose={chooseCategory}/></div><div id="catalogo">{filtered.length ? shownCategories.map((category) => <Category key={category.id} category={category} items={filtered.filter((item) => item.categoryId === category.id)} showHeading={active === "all"}/>) : <div className="grid min-h-72 place-items-center border-b border-white/[.06] text-center"><div><Search className="mx-auto h-7 w-7 text-[#35C8FF]"/><p className="font-tektur mt-4 text-sm font-black uppercase">Nenhum visual encontrado</p><button onClick={showAll} className="font-tektur mt-4 text-[.6rem] font-black uppercase text-[#35C8FF]">Limpar filtros</button></div></div>}</div><Steps/></>}</main><Footer/><CartNotice/></div>;
 }
 
 

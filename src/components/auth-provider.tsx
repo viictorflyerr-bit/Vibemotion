@@ -8,10 +8,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import {
-  signOut as signOutGoogle,
-  useSession,
-} from "next-auth/react";
 
 export type AuthUser = {
   id: string;
@@ -38,7 +34,7 @@ type AuthContextValue = {
   displayName: string;
   login: (credentials: AuthCredentials) => Promise<AuthUser>;
   register: (credentials: AuthCredentials) => Promise<AuthUser>;
-  logout: () => Promise<void>;
+  logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -124,27 +120,8 @@ function resolveDisplayName(user: AuthUser | null) {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { data: googleSession, status: googleStatus } = useSession();
-  const [localUser, setLocalUser] = useState<AuthUser | null>(null);
-  const [localHydrated, setLocalHydrated] = useState(false);
-
-  const googleUser = useMemo<AuthUser | null>(() => {
-    const email = googleSession?.user?.email?.trim().toLowerCase();
-
-    if (!email) {
-      return null;
-    }
-
-    const fallbackName = email.split("@")[0] || "Cliente";
-    const name = googleSession?.user?.name?.trim() || fallbackName;
-
-    return {
-      id: "user-" + email,
-      name,
-      email,
-      username: fallbackName,
-    };
-  }, [googleSession]);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -158,22 +135,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           );
 
           if (accountExists) {
-            setLocalUser(storedUser);
+            setUser(storedUser);
           } else {
             window.localStorage.removeItem(sessionStorageKey);
           }
         }
       } catch {
-        setLocalUser(null);
+        setUser(null);
         window.localStorage.removeItem(sessionStorageKey);
       } finally {
-        setLocalHydrated(true);
+        setHydrated(true);
       }
     });
   }, []);
 
   const persistUser = useCallback((nextUser: AuthUser) => {
-    setLocalUser(nextUser);
+    setUser(nextUser);
     window.localStorage.setItem(sessionStorageKey, JSON.stringify(nextUser));
     return nextUser;
   }, []);
@@ -239,17 +216,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [persistUser],
   );
 
-  const logout = useCallback(async () => {
-    setLocalUser(null);
+  const logout = useCallback(() => {
+    setUser(null);
     window.localStorage.removeItem(sessionStorageKey);
-
-    if (googleUser) {
-      await signOutGoogle({ redirect: false });
-    }
-  }, [googleUser]);
-
-  const user = googleUser ?? localUser;
-  const hydrated = localHydrated && googleStatus !== "loading";
+  }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({

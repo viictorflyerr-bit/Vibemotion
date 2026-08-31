@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, X } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
-import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { RecaptchaV2 } from "@/components/recaptcha-v2";
 import { verifyRecaptchaToken } from "@/lib/recaptcha";
 
@@ -27,9 +26,6 @@ function getAccessNotice() {
 
   const params = new URLSearchParams(window.location.search);
 
-  if (params.get("error")) {
-    return "Não foi possível entrar com o Google. Tente novamente ou use seu e-mail e senha.";
-  }
 
   return params.get("reason") === "cart"
     ? "Entre ou cadastre-se para adicionar cards ao carrinho."
@@ -109,15 +105,7 @@ export default function EntrarPage() {
             {accessNotice}
           </p>
         ) : null}
-        <GoogleSignInButton returnTo={returnTo} />
-        <div className="my-7 flex items-center gap-3" aria-hidden="true">
-          <span className="h-px flex-1 bg-white/10" />
-          <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.16em] text-cyan-50/35">
-            ou entre com e-mail
-          </span>
-          <span className="h-px flex-1 bg-white/10" />
-        </div>
-        <label className="block">
+        <label className="mt-8 block">
           <span className="text-sm font-bold text-cyan-50/70">E-mail</span>
           <input
             type="email"
