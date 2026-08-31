@@ -13,7 +13,8 @@ export const siteConfig = {
   checkoutUrl: process.env.NEXT_PUBLIC_CHECKOUT_URL ?? "",
   checkoutTarget:
     process.env.NEXT_PUBLIC_CHECKOUT_TARGET === "_self" ? "_self" : "_blank",
-  whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "",
+  whatsappNumber:
+    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5584993571294",
 };
 
 export const navItems = [

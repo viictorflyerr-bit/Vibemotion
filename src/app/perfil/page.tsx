@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Box, LogOut } from "lucide-react";
+import { ArrowLeft, Box, LogOut, Trash2 } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
 import { useOrders } from "@/components/order-provider";
 import { formatCurrency } from "@/lib/catalog-data";
@@ -19,9 +19,18 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-function OrderCard({ order }: { order: Order }) {
+function OrderCard({
+  order,
+  onDelete,
+}: {
+  order: Order;
+  onDelete: (orderId: string) => void;
+}) {
   const status = orderStatusCopy[order.status];
   const action = getOrderAction(order);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const canDelete =
+    order.status === "pending" || order.status === "payment_pending";
 
   return (
     <article className="hover-border-card rounded-[10px] border border-cyan-100/10 bg-[#1B1D20] p-5 transition">
@@ -103,6 +112,45 @@ function OrderCard({ order }: { order: Order }) {
           {action.label}
         </Link>
       ) : null}
+
+      {canDelete ? (
+        confirmingDelete ? (
+          <div className="mt-5 rounded-[8px] border border-red-400/25 bg-red-400/[0.06] p-4">
+            <p className="text-sm font-bold text-white">
+              Excluir este pedido pendente?
+            </p>
+            <p className="mt-1 text-xs leading-5 text-cyan-50/50">
+              O pedido será removido do seu perfil.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => onDelete(order.id)}
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-[7px] bg-red-500 px-4 text-xs font-black uppercase tracking-[0.1em] text-white transition hover:bg-red-400"
+              >
+                <Trash2 aria-hidden="true" className="h-4 w-4" />
+                Sim, excluir
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmingDelete(false)}
+                className="min-h-10 rounded-[7px] border border-cyan-100/14 px-4 text-xs font-black uppercase tracking-[0.1em] text-cyan-50/70 transition hover:border-white/30 hover:text-white"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setConfirmingDelete(true)}
+            className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border border-red-400/25 px-4 text-xs font-black uppercase tracking-[0.1em] text-red-300 transition hover:border-red-400/55 hover:bg-red-400/[0.07] hover:text-red-200"
+          >
+            <Trash2 aria-hidden="true" className="h-4 w-4" />
+            Excluir pedido pendente
+          </button>
+        )
+      ) : null}
     </article>
   );
 }
@@ -110,7 +158,7 @@ function OrderCard({ order }: { order: Order }) {
 export default function PerfilPage() {
   const router = useRouter();
   const { user, hydrated, displayName, logout } = useAuth();
-  const { orders } = useOrders();
+  const { orders, deletePendingOrder } = useOrders();
 
   useEffect(() => {
     if (hydrated && !user) {
@@ -195,7 +243,11 @@ export default function PerfilPage() {
           ) : (
             <div className="mt-7 grid gap-5 lg:grid-cols-2">
               {orders.map((order) => (
-                <OrderCard key={order.id} order={order} />
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  onDelete={deletePendingOrder}
+                />
               ))}
             </div>
           )}

@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useAuth } from "@/components/auth-provider";
 import type { CartItem } from "@/lib/catalog-data";
 import { getProductById } from "@/lib/catalog-data";
 
@@ -16,7 +17,7 @@ type CartContextValue = {
   subtotal: number;
   floatingCartVisible: boolean;
   isSelected: (productId: string) => boolean;
-  addItem: (productId: string) => void;
+  addItem: (productId: string) => boolean;
   removeItem: (productId: string) => void;
   clearCart: () => void;
   dismissFloatingCart: () => void;
@@ -26,6 +27,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 const storageKey = "vibe-motion-cart";
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { user, hydrated: authHydrated } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [floatingCartVisible, setFloatingCartVisible] = useState(false);
@@ -48,10 +50,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (hydrated) {
+    if (authHydrated && !user) {
+      queueMicrotask(() => {
+        setItems([]);
+        setFloatingCartVisible(false);
+        setFloatingCartDismissed(false);
+        window.localStorage.removeItem(storageKey);
+      });
+    }
+  }, [authHydrated, user]);
+
+  useEffect(() => {
+    if (hydrated && user) {
       window.localStorage.setItem(storageKey, JSON.stringify(items));
     }
-  }, [hydrated, items]);
+  }, [hydrated, items, user]);
 
   const value = useMemo<CartContextValue>(() => {
     const count = items.reduce((total, item) => total + item.quantity, 0);
@@ -68,6 +81,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       isSelected: (productId) =>
         items.some((item) => item.productId === productId),
       addItem: (productId) => {
+        if (!user) {
+          return false;
+        }
+
         setItems((current) => {
           if (current.some((item) => item.productId === productId)) {
             return current;
@@ -79,6 +96,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
           return [...current, { productId, quantity: 1 }];
         });
+
+        return true;
       },
       removeItem: (productId) =>
         setItems((current) =>
@@ -93,7 +112,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setFloatingCartDismissed(true);
       },
     };
-  }, [floatingCartDismissed, floatingCartVisible, items]);
+  }, [floatingCartDismissed, floatingCartVisible, items, user]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

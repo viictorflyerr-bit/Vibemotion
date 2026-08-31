@@ -21,6 +21,7 @@ type CreateOrderInput = {
 type OrderContextValue = {
   orders: Order[];
   createOrder: (input: CreateOrderInput) => Order;
+  deletePendingOrder: (orderId: string) => void;
 };
 
 const OrderContext = createContext<OrderContextValue | null>(null);
@@ -76,6 +77,28 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     [user],
   );
 
+  const deletePendingOrder = useCallback(
+    (orderId: string) => {
+      if (!user) return;
+
+      setAllOrders((current) => {
+        const order = current.find((entry) => entry.id === orderId);
+
+        if (
+          !order ||
+          order.userId !== user.id ||
+          (order.status !== "pending" && order.status !== "payment_pending")
+        ) {
+          return current;
+        }
+
+        const nextOrders = current.filter((entry) => entry.id !== orderId);
+        writeOrders(nextOrders);
+        return nextOrders;
+      });
+    },
+    [user],
+  );
   const value = useMemo<OrderContextValue>(
     () => ({
       orders: user
@@ -88,8 +111,9 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
             )
         : [],
       createOrder,
+      deletePendingOrder,
     }),
-    [allOrders, createOrder, user],
+    [allOrders, createOrder, deletePendingOrder, user],
   );
 
   return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;

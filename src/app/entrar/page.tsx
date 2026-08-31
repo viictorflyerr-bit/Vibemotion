@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, X } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
+import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { RecaptchaV2 } from "@/components/recaptcha-v2";
 import { verifyRecaptchaToken } from "@/lib/recaptcha";
 
@@ -19,10 +20,27 @@ function getReturnTo() {
   return returnTo?.startsWith("/") ? returnTo : "/";
 }
 
+function getAccessNotice() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get("error")) {
+    return "Não foi possível entrar com o Google. Tente novamente ou use seu e-mail e senha.";
+  }
+
+  return params.get("reason") === "cart"
+    ? "Entre ou cadastre-se para adicionar cards ao carrinho."
+    : "";
+}
+
 export default function EntrarPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [returnTo, setReturnTo] = useState("/");
+  const [accessNotice, setAccessNotice] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
@@ -33,6 +51,7 @@ export default function EntrarPage() {
   useEffect(() => {
     queueMicrotask(() => {
       setReturnTo(getReturnTo());
+      setAccessNotice(getAccessNotice());
     });
   }, []);
 
@@ -82,7 +101,23 @@ export default function EntrarPage() {
           <X aria-hidden="true" className="h-5 w-5" />
         </Link>
         <h1 className="text-center text-3xl font-black">Entrar</h1>
-        <label className="mt-8 block">
+        {accessNotice ? (
+          <p
+            className="mt-5 rounded-[7px] border border-[#35C8FF]/30 bg-[#35C8FF]/10 px-4 py-3 text-center text-sm leading-6 text-cyan-50/80"
+            role="status"
+          >
+            {accessNotice}
+          </p>
+        ) : null}
+        <GoogleSignInButton returnTo={returnTo} />
+        <div className="my-7 flex items-center gap-3" aria-hidden="true">
+          <span className="h-px flex-1 bg-white/10" />
+          <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.16em] text-cyan-50/35">
+            ou entre com e-mail
+          </span>
+          <span className="h-px flex-1 bg-white/10" />
+        </div>
+        <label className="block">
           <span className="text-sm font-bold text-cyan-50/70">E-mail</span>
           <input
             type="email"

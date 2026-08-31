@@ -145,32 +145,48 @@ export function createOrderRecord({
 
 export function buildWhatsAppMessage(order: Order) {
   const itemList = order.items
-    .map(
-      (item) =>
-        `- ${item.quantity > 1 ? `${item.quantity}x ` : ""}${item.title} (Cód: ${item.productCode})`,
+    .map((item, index) =>
+      [
+        `${index + 1}. *${item.title}*`,
+        `   Código: ${item.productCode}`,
+        `   Categoria: ${item.category}`,
+        `   Quantidade: ${item.quantity}`,
+        `   Valor: ${formatCurrency(item.total)}`,
+      ].join("\n"),
     )
-    .join("\n");
+    .join("\n\n");
 
-  const customerLines = [
-    `Nome / Empresa: ${order.customerName}`,
-    order.artistName ? `Artista: ${order.artistName}` : "",
-    order.musicGenre ? `Gênero Musical: ${order.musicGenre}` : "",
-  ].filter(Boolean);
+  const imageAddOn =
+    order.addOnsTotal > 0
+      ? `Sim (+${formatCurrency(order.addOnsTotal)})`
+      : "Não";
 
   const messageParts = [
-    `Olá! Gostaria de fazer o seguinte pedido (ID: #${order.shortId}):`,
+    "Olá, Vibe Motion! 👋",
     "",
+    `Quero finalizar meu pedido *#${order.shortId}* com os dados abaixo:`,
+    "",
+    "*Dados preenchidos:*",
+    `• Nome: ${order.customerName}`,
+    `• E-mail: ${order.customerEmail}`,
+    order.artistName ? `• Artista / banda: ${order.artistName}` : "",
+    order.musicGenre ? `• Ritmo musical: ${order.musicGenre}` : "",
+    "",
+    "*Itens selecionados:*",
     itemList,
     "",
-    `*Total estimado:* ${formatCurrency(order.total)}`,
-    "",
-    "*Dados do Cliente:*",
-    customerLines.join("\n"),
-  ];
+    `• Imagem/foto nos vídeos: ${imageAddOn}`,
+    `• Total do pedido: *${formatCurrency(order.total)}*`,
+  ].filter(Boolean);
 
   if (order.notes) {
     messageParts.push("", "*Observações:*", order.notes);
   }
+
+  messageParts.push(
+    "",
+    "Por favor, confirme os próximos passos para pagamento e envio.",
+  );
 
   return messageParts.join("\n");
 }

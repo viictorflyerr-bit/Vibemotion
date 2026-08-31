@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { AuthSessionProvider } from "@/components/auth-session-provider";
 import { AuthProvider } from "@/components/auth-provider";
 import { CartProvider } from "@/components/cart-provider";
 import { MotionProvider } from "@/components/motion-provider";
@@ -36,15 +37,16 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full" suppressHydrationWarning>
-        <AuthProvider>
-          <CartProvider>
-            <OrderProvider>
-              <MotionProvider>{children}</MotionProvider>
-
-            </OrderProvider>
-          </CartProvider>
-          <CustomCursor />
-        </AuthProvider>
+        <AuthSessionProvider>
+          <AuthProvider>
+            <CartProvider>
+              <OrderProvider>
+                <MotionProvider>{children}</MotionProvider>
+              </OrderProvider>
+            </CartProvider>
+            <CustomCursor />
+          </AuthProvider>
+        </AuthSessionProvider>
         <Analytics />
       </body>
     </html>

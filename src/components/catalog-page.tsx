@@ -9,6 +9,7 @@ import {
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, CircleUserRound, ListChecks, LogOut, Menu, Play, Search, ShoppingBag, X } from "lucide-react";
 import { categories, formatPrice, products, type Product } from "@/lib/catalog-data";
 import { useAuth } from "@/components/auth-provider";
@@ -170,9 +171,70 @@ function Filters({ active, choose }: { active: string; choose: (value: string) =
 }
 
 function ProductCard({ product }: { product: Product }) {
+  const router = useRouter();
+  const { user, hydrated } = useAuth();
   const { addItem, isSelected } = useCart();
   const selected = isSelected(product.id);
-  return <article className="group min-w-0 border border-white/[.07] bg-[#0D0F12] transition duration-300 hover:-translate-y-1 hover:border-[#35C8FF]/45 hover:shadow-[0_18px_45px_rgba(8,126,255,.12)]"><div className="relative overflow-hidden bg-[#111721]"><Image src={product.thumbnail} alt={product.title} width={720} height={420} className="aspect-video w-full object-cover transition duration-500 group-hover:scale-[1.04]" sizes="(max-width:560px) 50vw, (max-width:920px) 33vw, 25vw"/><span className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"/><button className="absolute left-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-black/60 text-white transition group-hover:bg-[#35C8FF] group-hover:text-[#05070A]" aria-label={`Assistir ${product.title}`}><Play className="ml-0.5 h-3.5 w-3.5 fill-current"/></button><span className="font-tektur absolute bottom-2 right-2 bg-black/70 px-2 py-1 text-[.5rem] font-bold uppercase tracking-[.12em] text-white/70">Full HD</span></div><div className="p-3"><p className="font-tektur text-[.5rem] font-bold uppercase tracking-[.17em] text-[#35C8FF]">{product.code}</p><h3 className="font-tektur mt-1.5 truncate text-[.73rem] font-black uppercase text-white">{product.title}</h3><button disabled={selected} onClick={() => addItem(product.id)} className={`font-tektur mt-3 flex h-9 w-full items-center justify-between px-3 text-[.58rem] font-black uppercase tracking-[.08em] transition ${selected ? "border border-[#35C8FF]/35 bg-[#35C8FF]/10 text-[#35C8FF]" : "bg-[#35C8FF] text-[#05070A] hover:bg-white"}`}><span>{selected ? "Adicionado" : "Adicionar"}</span><span>{formatPrice(product.price)}</span></button></div></article>;
+
+  function handleAddItem() {
+    if (!hydrated) return;
+
+    if (!user) {
+      router.push(
+        "/entrar?returnTo=" + encodeURIComponent("/") + "&reason=cart",
+      );
+      return;
+    }
+
+    addItem(product.id);
+  }
+
+  return (
+    <article className="group min-w-0 border border-white/[.07] bg-[#0D0F12] transition duration-300 hover:-translate-y-1 hover:border-[#35C8FF]/45 hover:shadow-[0_18px_45px_rgba(8,126,255,.12)]">
+      <div className="relative overflow-hidden bg-[#111721]">
+        <Image
+          src={product.thumbnail}
+          alt={product.title}
+          width={720}
+          height={420}
+          className="aspect-video w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+          sizes="(max-width:560px) 50vw, (max-width:920px) 33vw, 25vw"
+        />
+        <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <button
+          type="button"
+          className="absolute left-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-black/60 text-white transition group-hover:bg-[#35C8FF] group-hover:text-[#05070A]"
+          aria-label={`Assistir ${product.title}`}
+        >
+          <Play className="ml-0.5 h-3.5 w-3.5 fill-current" />
+        </button>
+        <span className="font-tektur absolute bottom-2 right-2 bg-black/70 px-2 py-1 text-[.5rem] font-bold uppercase tracking-[.12em] text-white/70">
+          Full HD
+        </span>
+      </div>
+      <div className="p-3">
+        <p className="font-tektur text-[.5rem] font-bold uppercase tracking-[.17em] text-[#35C8FF]">
+          {product.code}
+        </p>
+        <h3 className="font-tektur mt-1.5 truncate text-[.73rem] font-black uppercase text-white">
+          {product.title}
+        </h3>
+        <button
+          type="button"
+          disabled={selected || !hydrated}
+          onClick={handleAddItem}
+          className={`font-tektur mt-3 flex h-9 w-full items-center justify-between px-3 text-[.58rem] font-black uppercase tracking-[.08em] transition ${
+            selected
+              ? "border border-[#35C8FF]/35 bg-[#35C8FF]/10 text-[#35C8FF]"
+              : "bg-[#35C8FF] text-[#05070A] hover:bg-white"
+          }`}
+        >
+          <span>{selected ? "Adicionado" : "Adicionar"}</span>
+          <span>{formatPrice(product.price)}</span>
+        </button>
+      </div>
+    </article>
+  );
 }
 
 function Category({ category, items, showHeading = true }: { category: (typeof categories)[number]; items: Product[]; showHeading?: boolean }) {
