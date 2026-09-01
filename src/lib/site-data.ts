@@ -123,18 +123,12 @@ export const benefits = [
     title: "Do zero ao visual em minutos",
     body: "Sem experiência, sem programa de edição. O tempo entre o acesso e o primeiro visual pronto é de minutos.",
   },
-  {
-    icon: "book",
-    title: "Tutoriais do zero",
-    body: "Guias em português que mostram tudo, do primeiro acesso até o visual rodando no seu show.",
-  },
 ];
 
 export const offerItems = [
   "Biblioteca completa de visuais 3D exclusivos",
   "Acesso imediato após o pagamento",
   "Novos modelos toda semana",
-  "Tutoriais do zero em português",
   "Pode usar em shows, festas e eventos",
   "Pode oferecer o serviço para outros cantores e cobrar por isso",
   "Paga uma vez e acessa para sempre",
@@ -180,7 +174,7 @@ export const faqs = [
   {
     question: "Preciso entender de edição de vídeo?",
     answer:
-      "Não. Você copia o modelo da plataforma, cola no gerador e o visual aparece pronto. Os tutoriais inclusos mostram cada passo.",
+      "Não. Você copia o modelo da plataforma, cola no gerador e o visual aparece pronto. Se precisar, o suporte ajuda em cada passo.",
   },
   {
     question: "Quanto tempo leva pra ter o primeiro visual?",
@@ -195,7 +189,7 @@ export const faqs = [
   {
     question: "Que gerador eu uso?",
     answer:
-      "Os modelos funcionam com os principais geradores de vídeo disponíveis. Os tutoriais mostram exatamente como usar cada um, do zero.",
+      "Os modelos funcionam com os principais geradores de vídeo disponíveis. Se precisar, o suporte orienta você no uso.",
   },
   {
     question: "Acesso vence depois de algum tempo?",

@@ -23,7 +23,6 @@ import { useCart } from "@/components/cart-provider";
 const nav = [
   ["Início", "/"],
   ["Suporte", "/suporte"],
-  ["Tutoriais", "/#tutoriais"],
   ["Pedidos", "/pedidos"],
 ];
 
@@ -88,7 +87,7 @@ export default function PedidosPage() {
         <button onClick={() => setOpen(!open)} className="grid h-10 w-10 place-items-center text-[#35C8FF] lg:hidden" aria-label="Abrir menu">{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
         <div className="hidden lg:block"><Brand /></div>
         <nav className="hidden h-full lg:flex">
-          {nav.map(([label, href], index) => <Link key={href} href={href} className={"font-tektur flex h-full items-center border-b-2 px-4 text-[.68rem] font-black uppercase tracking-[.1em] transition " + (index === 3 ? "border-[#35C8FF] text-[#35C8FF]" : "border-transparent text-white/55 hover:text-white")}>{label}</Link>)}
+          {nav.map(([label, href], index) => <Link key={href} href={href} className={"font-tektur flex h-full items-center border-b-2 px-4 text-[.68rem] font-black uppercase tracking-[.1em] transition " + (index === 2 ? "border-[#35C8FF] text-[#35C8FF]" : "border-transparent text-white/55 hover:text-white")}>{label}</Link>)}
         </nav>
         <div className="mx-auto lg:hidden"><Brand /></div>
         <div className="ml-auto hidden items-center gap-3 lg:flex">
@@ -99,7 +98,7 @@ export default function PedidosPage() {
       </div>
 
       {open ? <nav className="absolute inset-x-0 top-[72px] min-h-[calc(100vh-72px)] bg-[#07090C] p-5 lg:hidden">
-        <div className="grid gap-1">{nav.map(([label, href], index) => <Link key={href} href={href} onClick={() => setOpen(false)} className={"font-tektur flex h-14 items-center border-b border-l-2 border-white/[.08] pl-4 text-sm font-black uppercase tracking-[.1em] transition " + (index === 3 ? "border-l-[#35C8FF] bg-[#35C8FF]/8 text-[#35C8FF]" : "border-l-transparent text-white")}>{label}</Link>)}</div>
+        <div className="grid gap-1">{nav.map(([label, href], index) => <Link key={href} href={href} onClick={() => setOpen(false)} className={"font-tektur flex h-14 items-center border-b border-l-2 border-white/[.08] pl-4 text-sm font-black uppercase tracking-[.1em] transition " + (index === 2 ? "border-l-[#35C8FF] bg-[#35C8FF]/8 text-[#35C8FF]" : "border-l-transparent text-white")}>{label}</Link>)}</div>
         <div className="mt-8 grid gap-3">
           {user ? <><Link href="/perfil" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center gap-2 rounded-full border border-white/14 text-xs font-black uppercase"><CircleUserRound className="h-4 w-4" />{displayName}</Link><button onClick={exit} className="font-tektur flex h-12 items-center justify-center gap-2 text-xs font-black uppercase text-white/55"><LogOut className="h-4 w-4" />Sair</button></> : <><Link href="/entrar" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center gap-2 rounded-full border border-white/14 text-xs font-black uppercase"><CircleUserRound className="h-4 w-4" />Entrar</Link><Link href="/cadastro" onClick={() => setOpen(false)} className="font-tektur flex h-12 items-center justify-center text-xs font-black uppercase text-[#35C8FF]">Criar conta</Link></>}
           <Link href="/pedido" onClick={() => setOpen(false)} className="shine-button font-tektur h-12 gap-2 text-xs font-black uppercase"><ShoppingBag className="h-4 w-4" />Carrinho</Link>

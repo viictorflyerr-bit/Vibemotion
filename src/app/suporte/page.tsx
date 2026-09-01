@@ -14,7 +14,6 @@ import { catalogConfig } from "@/lib/catalog-data";
 const nav = [
   ["Início", "/"],
   ["Suporte", "/suporte"],
-  ["Tutoriais", "/#tutoriais"],
   ["Pedidos", "/pedidos"],
 ];
 

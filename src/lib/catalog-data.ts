@@ -191,6 +191,20 @@ const categoryPosterMap: Record<string, string[]> = {
   "retro-baile": ["/posters/pack-07.svg", "/posters/pack-10.svg"],
 };
 
+const numberedCategoryCoverFolders: Record<string, string> = {
+  "forro-piseiro-sertanejo": "forro-piseiro",
+  futurista: "futurista",
+  "amor-paixao-romance": "amor-paixao-romance",
+  "las-vegas": "las-vegas",
+  boteco: "boteco",
+  "eletronica-dj": "eletronica-dj",
+  letreiros: "letreiros",
+  rock: "rock",
+  "e-os-guri-rs": "e-os-guri-rs",
+  pagode: "pagode",
+  "retro-baile": "retro-baile",
+};
+
 const productNames: Record<string, string[]> = {
   variados: [
     "CHARMOSA",
@@ -225,18 +239,15 @@ const productNames: Record<string, string[]> = {
     "SANFONAS INDUSTRIAIS",
     "CURRAL ILUMINADO",
     "FAZENDA DO AGRO",
-    "FORRO QUENTE",
     "FESTA COM CAVALOS",
     "FESTA COM CAVALOS PELA NOITE",
     "JANELA DA PAIXÃO",
     "NA FAZENDA",
     "NO RODEIO",
-    "NÓS SOMOS DA ROÇA",
     "SALOON AMERICANO",
     "CAVALGADA DO MATUTO",
     "XILOGRAVURA NORDESTINA",
     "NO INTERIOR",
-    "NOITE NO INTERIOR",
     "FORRÓ DE INTERIOR",
     "SALA DO VAQUEIRO",
     "SHOW NOTURNO",
@@ -291,9 +302,6 @@ const productNames: Record<string, string[]> = {
     "SALA DE MONITORAMENTO",
     "NA MESA DA DJ",
     "TUNEL NEON",
-    "BALADA NOTURNA",
-    "NA MESA DO DJ",
-    "CORREDOR NEON",
   ],
   letreiros: [
     "TEATRO DOS SONHOS",
@@ -332,15 +340,24 @@ const productNames: Record<string, string[]> = {
 export const products: Product[] = categories.flatMap((category, categoryIndex) => {
   const posters = categoryPosterMap[category.id] ?? ["/posters/pack-01.svg"];
   const names = productNames[category.id] ?? [category.name];
+  const numberedCoverFolder = numberedCategoryCoverFolders[category.id];
 
-  return names.map((name, productIndex) => ({
-    id: `${category.id}-${productIndex + 1}`,
-    code: `VM-${String(categoryIndex + 1).padStart(2, "0")}${String(productIndex + 1).padStart(2, "0")}`,
-    title: name,
-    categoryId: category.id,
-    price: pricing.currentPrice,
-    thumbnail: posters[productIndex % posters.length],
-  }));
+  return names.map((name, productIndex) => {
+    const code = `VM-${String(categoryIndex + 1).padStart(2, "0")}${String(productIndex + 1).padStart(2, "0")}`;
+
+    return {
+      id: `${category.id}-${productIndex + 1}`,
+      code,
+      title: name,
+      categoryId: category.id,
+      price: pricing.currentPrice,
+      thumbnail: category.id === "variados"
+        ? `/catalog/variados/${code}.jpeg`
+        : numberedCoverFolder
+          ? `/catalog/${numberedCoverFolder}/${String(productIndex + 1).padStart(2, "0")}.jpeg`
+          : posters[productIndex % posters.length],
+    };
+  });
 });
 
 export const infoStrip = [

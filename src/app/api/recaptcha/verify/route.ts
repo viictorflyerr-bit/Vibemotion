@@ -6,6 +6,39 @@ type GoogleVerificationResponse = {
   "error-codes"?: string[];
 };
 
+function verificationErrorMessage(errorCodes: string[]) {
+  if (errorCodes.includes("timeout-or-duplicate")) {
+    return "O reCAPTCHA expirou. Marque novamente e envie em até dois minutos.";
+  }
+
+  if (
+    errorCodes.includes("missing-input-secret") ||
+    errorCodes.includes("invalid-input-secret")
+  ) {
+    return "A chave secreta do reCAPTCHA está incorreta na Vercel.";
+  }
+
+  if (
+    errorCodes.includes("missing-input-response") ||
+    errorCodes.includes("invalid-input-response")
+  ) {
+    return "As chaves do reCAPTCHA não correspondem ou o domínio não está autorizado.";
+  }
+
+  return "O reCAPTCHA não foi validado. Marque novamente e tente outra vez.";
+}
+
+function normalizeHostname(value: string | null | undefined) {
+  if (!value) return "";
+
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .split("/")[0]
+    .split(":")[0];
+}
+
 export async function POST(request: Request) {
   const secretKey = process.env.RECAPTCHA_SECRET_KEY;
 
@@ -66,10 +99,12 @@ export async function POST(request: Request) {
     const result = (await googleResponse.json()) as GoogleVerificationResponse;
 
     if (!result.success) {
+      const errorCodes = result["error-codes"] ?? [];
+      console.error("Falha do Google reCAPTCHA:", errorCodes.join(", "));
       return NextResponse.json(
         {
           success: false,
-          message: "O reCAPTCHA expirou ou não foi validado. Tente novamente.",
+          message: verificationErrorMessage(errorCodes),
         },
         { status: 400 },
       );
@@ -77,16 +112,21 @@ export async function POST(request: Request) {
 
     const allowedHostnames = (process.env.RECAPTCHA_ALLOWED_HOSTNAMES ?? "")
       .split(",")
-      .map((hostname) => hostname.trim().toLowerCase())
+      .map(normalizeHostname)
       .filter(Boolean);
 
     if (
       allowedHostnames.length > 0 &&
       (!result.hostname ||
-        !allowedHostnames.includes(result.hostname.toLowerCase()))
+        !allowedHostnames.includes(normalizeHostname(result.hostname)))
     ) {
       return NextResponse.json(
-        { success: false, message: "Origem do reCAPTCHA não autorizada." },
+        {
+          success: false,
+          message: result.hostname
+            ? "Origem não autorizada. Adicione " + result.hostname + " em RECAPTCHA_ALLOWED_HOSTNAMES na Vercel."
+            : "Origem do reCAPTCHA não autorizada.",
+        },
         { status: 400 },
       );
     }
