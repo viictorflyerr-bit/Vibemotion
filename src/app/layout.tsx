@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AuthProvider } from "@/components/auth-provider";
 import { CartProvider } from "@/components/cart-provider";
 import { MotionProvider } from "@/components/motion-provider";
@@ -45,9 +46,8 @@ export default function RootLayout({
           <CustomCursor />
         </AuthProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
 }
-
-
